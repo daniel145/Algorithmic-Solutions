@@ -36,8 +36,14 @@ public class NQueens : MonoBehaviour
     int[,] illegalSpaces;
 
     int boardLength;
+    int startingCol;
+
+
     #endregion
 
+    private void Start() {
+        BoardSetUp(8, 0, 7);
+    }
 
     public void BoardSetUp(int length, int xCoord, int yCoord) {
         queens = new Stack((int)length);
@@ -48,42 +54,36 @@ public class NQueens : MonoBehaviour
             throw new Exception("Initial queen placement is invalid. Queen is trying to be placed at " + xCoord + " " + yCoord);
         }
 
+        startingCol = xCoord;
         Coord newCoordinate = new Coord(xCoord, yCoord);
         PlaceQueen(newCoordinate);
 
         QueenAdder();
-    }
-    /* // ehhh lets try this recursively first
-    private void BeginBacktrace() {
-        //while (queens.Count )
-        int startingCol = queens.Peek.X;
-        Coord curr;
-        for(int i = 0; i < boardLength; i++) {
-            bool placedQueen = false;
-            if (i == startingCol) continue;
-            for (int j = 0; j < boardLength; j++) {
-                if (!illegalSpaces[i, j] && curr.Y != j) {
-                    curr = new Coord(i, j);
-                    PlaceQueen(curr);
-                    placedQueen = true;
-                    break;
-                }
-            }
-            if (!placedQueen){
-                RemoveQueen();
-                //put it in the NEXT legal space
-                i--;
-            }
+
+        bool[,] queenDisplay = new bool[8, 8];
+        while (queens.Count > 0) {
+            Queen q = (Queen)queens.Pop();
+            Coord coord = q.Coordinate;
+            queenDisplay[coord.X, coord.Y] = true;
         }
+        Print2DArray(queenDisplay);
+
     }
-   */
 
     private void QueenAdder() {
         bool placedQueen = false;
+        //curr = 6, 4
         Coord curr = new Coord(0, 0);
+        int counter = 0;
         for (int i = 0; i < boardLength; i++) {
+            if (startingCol == i) continue;
+            if (counter >= 5000) {
+                Debug.Log("ya dun fked up");
+                break;
+            }
+     
             placedQueen = false;
-            for (int j = 0; i < boardLength; j++) { 
+            for (int j = 0; j < boardLength; j++) {
                 if (illegalSpaces[i, j] == 0) {
                     curr = new Coord(i, j);
                     PlaceQueen(curr);
@@ -94,6 +94,7 @@ public class NQueens : MonoBehaviour
             if (!placedQueen) {
                 i -= Backtracker(curr);
             }
+            counter++;
         }
     }
 
@@ -113,7 +114,7 @@ public class NQueens : MonoBehaviour
             }
         }
         if (!placedQueen) {
-            backsteps++;
+            //backsteps++;
             Queen temp = (Queen)queens.Peek();
             return backsteps + Backtracker(temp.Coordinate);
         }
@@ -188,4 +189,17 @@ public class NQueens : MonoBehaviour
     }
     #endregion
 
+
+    public static void Print2DArray(bool[,] matrix) {
+        Debug.Log("reached");
+        string arrayString = "";
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                arrayString += string.Format("{0} ", matrix[i, j]);
+            }
+            arrayString += System.Environment.NewLine + System.Environment.NewLine;
+        }
+
+        Debug.Log(arrayString);
+    }
 }
