@@ -51,11 +51,35 @@ public class NQueens : MonoBehaviour
         Coord newCoordinate = new Coord(xCoord, yCoord);
         PlaceQueen(newCoordinate);
 
-        BeginBranchBound();
+        BeginBacktrace();
     }
-
-    private void BeginBranchBound() { 
+    /* // ehhh lets try this recursively first
+    private void BeginBacktrace() {
         //while (queens.Count )
+        int startingCol = queens.Peek.X;
+        Coord curr;
+        for(int i = 0; i < boardLength; i++) {
+            bool placedQueen = false;
+            if (i = startingCol) continue;
+            for (int j = 0; j < boardLength; j++) {
+                if (!illegalSpaces[i, j] && curr.Y != j) {
+                    curr = new Coord(i, j);
+                    PlaceQueen(curr);
+                    placedQueen = true;
+                    break;
+                }
+            }
+            if (!placedQueen){
+                RemoveQueen();
+                //put it in the NEXT legal space
+                i--;
+            }
+        }
+    }
+   */
+
+    private void BacktraceRecur(Coord c) {
+
     }
 
     #region Queen Logistics
