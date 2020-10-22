@@ -55,7 +55,7 @@ public class NQueens : MonoBehaviour
     }
 
     private void BeginBranchBound() { 
-    
+        //while (queens.Count )
     }
 
     #region Queen Logistics
