@@ -17,6 +17,7 @@ public class GlowTiles : MonoBehaviour
     private Tilemap tilemap;
     private Vector3Int pastTile;
     private GameObject queensFolder;
+    private List<GameObject> queenList;
     #endregion
 
     // Start is called before the first frame update
@@ -24,6 +25,7 @@ public class GlowTiles : MonoBehaviour
     {
         tilemap = GetComponent<Tilemap>();
         queensFolder = new GameObject("QueensFolder");
+        queenList = new List<GameObject>();
     }
 
     // If glow is enabled, then give the tile being moused over a yellow background.
@@ -61,6 +63,26 @@ public class GlowTiles : MonoBehaviour
         }
     }
 
+    #region Public Functions
+    // Adds a queen to board.
+    public void AddQueen(int x, int y)
+    {
+        GameObject obj = Instantiate(queenPrefab);
+        obj.transform.position = new Vector3(x * 2, 0, y * 2);
+        obj.transform.parent = queensFolder.transform;
+        queenList.Add(obj);
+    }
+
+    public void RemoveQueen()
+    {
+        int index = queenList.Count - 1;
+        GameObject queen = queenList[index];
+        queenList.Remove(queen);
+        Destroy(queen);
+    }
+    #endregion
+
+    #region Private Functions
     private void ConvertBack()
     {
         if (pastTile != Vector3Int.one)
@@ -79,10 +101,19 @@ public class GlowTiles : MonoBehaviour
 
     private void PlaceQueens(bool[,] array)
     {
+        // Check if an answer was returned
         if (array == null)
         {
             Debug.Log("Array was null");
             return;
+        }
+
+        // Remove any queens currently on the board
+        while (queenList.Count > 0)
+        {
+            int index = queenList.Count - 1;
+            queenList.Remove(queenList[index]);
+            Destroy(queenList[index]);
         }
 
         for (int i = 0; i < size; i++)
@@ -94,4 +125,5 @@ public class GlowTiles : MonoBehaviour
                     queen.transform.position = new Vector3(i * 2, 0, j * 2);
                 }
     }
+    #endregion
 }
