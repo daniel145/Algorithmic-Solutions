@@ -47,11 +47,10 @@ public class NQueensWey : MonoBehaviour
     #endregion
 
     #region Primary Functions
-
-    // Start is called before the first frame update
-    private void Start() {
-        BoardSetUp(8, 2, 4);
-    }
+    //Start function for manual testing purposes
+    //private void Start() {
+    //    BoardSetUp(8, 2, 4);
+    //}
 
     //The main function for initiating the N Queens Algorithm
     public bool[,] BoardSetUp(int length, int xCoord, int yCoord) {
@@ -66,7 +65,8 @@ public class NQueensWey : MonoBehaviour
         startingCol = xCoord;
         Coord newCoordinate = new Coord(xCoord, yCoord);
         PlaceQueen(newCoordinate);
-        return boardState;
+        if (Solver(0)) return boardState;
+        else return null;
 
         //if (Solver(0)) {
         //    Debug.Log("success!");
