@@ -58,18 +58,48 @@ public class NQueens : MonoBehaviour
         Coord newCoordinate = new Coord(xCoord, yCoord);
         PlaceQueen(newCoordinate);
 
-        QueenAdder();
+        if (Solver(0)) {
+            Debug.Log("success!");
+        }
+        else {
+            Debug.Log("boo");
+        }
 
         bool[,] queenDisplay = new bool[8, 8];
         while (queens.Count > 0) {
             Queen q = (Queen)queens.Pop();
+            Debug.Log(q.Coordinate.X + " " + q.Coordinate.Y);
             Coord coord = q.Coordinate;
             queenDisplay[coord.X, coord.Y] = true;
         }
         Print2DArray(queenDisplay);
+        Print2DArrayInt(illegalSpaces);
 
     }
+    //Begin Wey's attempt
+    private bool Solver(int column) {
+        if (column >= boardLength) return true;
 
+        if (column == startingCol) {
+            return Solver(column + 1);
+        }
+
+        for (int i = 0; i < boardLength; i++) {
+            if (illegalSpaces[column, i] == 0) {
+                Coord curr = new Coord(column, i);
+                PlaceQueen(curr);
+                if (Solver(column + 1) == true) {
+                    return true;
+                }
+                else {
+                    RemoveQueen();
+                }
+            }
+        }
+        return false;
+    }
+
+    //JPhan's attempt
     private void QueenAdder() {
         bool placedQueen = false;
         //curr = 6, 4
@@ -191,7 +221,18 @@ public class NQueens : MonoBehaviour
 
 
     public static void Print2DArray(bool[,] matrix) {
-        Debug.Log("reached");
+        string arrayString = "";
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                arrayString += string.Format("{0} ", matrix[i, j]);
+            }
+            arrayString += System.Environment.NewLine + System.Environment.NewLine;
+        }
+
+        Debug.Log(arrayString);
+    }
+
+    public static void Print2DArrayInt(int[,] matrix) {
         string arrayString = "";
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
