@@ -10,41 +10,36 @@ public class InternalTetris : MonoBehaviour
     public bool[,] InternalState { get { return GetAll(); } private set {} }
     #endregion
 
+    #region Start
     // Start is called before the first frame update
     void Start()
     {
         internalState = new bool[WIDTH, HEIGHT];
     }
+    #endregion
 
     #region Public Functions
-    public bool Set(int x, int y)
+    public bool Set(int x, int y, bool value = true)
     {
+        // Set the value at x, y of the internal state to value.
+
         if (IsIllegal(x,y))
-            throw new System.Exception("Passed illegal values to FillSquare");
+            throw new System.Exception("Passed illegal values to Set");
         else if (internalState[x, y])
             return false;
 
-        internalState[x, y] = true;
+        internalState[x, y] = value;
         return true;
     }
 
     public bool Get(int x, int y)
     {
+        // Get the value at x, y of the internal state
+
         if (IsIllegal(x, y))
-            throw new System.Exception("Passed illegal values to GetSquare");
+            throw new System.Exception("Passed illegal values to Get");
         else
             return internalState[x, y];
-    }
-
-    public bool Erase(int x, int y)
-    {
-        if (IsIllegal(x, y))
-            throw new System.Exception("Passed illegal values to EraseSquare");
-        else if (!internalState[x, y])
-            return false;
-
-        internalState[x, y] = false;
-        return true;
     }
 
     public void EraseRows(int y, int rowCount = 1)
@@ -98,6 +93,8 @@ public class InternalTetris : MonoBehaviour
 
     public bool CheckRowFill(int y)
     {
+        // Returns true if a row is filled (all values are true)
+
         for (int i = 0; i < WIDTH; i++)
             if (!internalState[i, y])
                 return false;
@@ -106,6 +103,8 @@ public class InternalTetris : MonoBehaviour
 
     public bool[,] GetAll()
     {
+        // Get a deep copy of the InternalState
+
         bool[,] copy = new bool[WIDTH, HEIGHT];
         for (int i = 0; i < WIDTH; i++)
             for (int j = 0; j < HEIGHT; j++)
@@ -115,6 +114,8 @@ public class InternalTetris : MonoBehaviour
 
     public void PrintState()
     {
+        // Debug.Log the current state of InternalState
+
         string row = "";
         for (int j = (int)HEIGHT - 1; j >= 0; j--)
         {
@@ -134,6 +135,8 @@ public class InternalTetris : MonoBehaviour
     #region Private Functions
     private bool IsIllegal(int x, int y)
     {
+        // Checks if given x, y coordinates falls within bounds of array
+
         if (x < 0 || x > WIDTH || y < 0 || y > HEIGHT)
             return true;
         return false;
