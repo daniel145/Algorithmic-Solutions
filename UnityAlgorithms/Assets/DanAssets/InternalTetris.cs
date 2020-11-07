@@ -147,7 +147,7 @@ public class InternalTetris : MonoBehaviour
         return -1;
     }
 
-    public int CheckAllHeight()
+    public int CheckHeightAll()
     {
         // Returns the height of the tallest filled square
 
