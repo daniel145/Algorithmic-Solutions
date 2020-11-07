@@ -7,7 +7,7 @@ public class InternalTetris : MonoBehaviour
     #region Private Variables
     private const uint WIDTH = 10, HEIGHT = 20;
     private bool[,] internalState;
-    public bool[,] InternalState { get { return GetAll(); } private set { }; }
+    public bool[,] InternalState { get { return GetAll(); } private set {} }
     #endregion
 
     // Start is called before the first frame update
@@ -47,19 +47,60 @@ public class InternalTetris : MonoBehaviour
         return true;
     }
 
-    public bool EraseRow(int x)
+    public void EraseRows(int y, int rowCount = 1)
     {
-        if (IsIllegal(x, 0))
+        // Erases rowCount rows starting from row y and moving upwards.
+        // Rows above erased rows falls to rowCount rows so they rest atop other blocks
+        
+        if (IsIllegal(0, y))
             throw new System.Exception("Passed illegal values to EraseRow");
-        bool rowFilled = true;
-        for (int j = 0; j < HEIGHT; j++)
+        else if (rowCount > HEIGHT - y)
         {
-            rowFilled = rowFilled && internalState[x, j];
-            internalState[x, j] = false;
+            Debug.Log("EraseRows: Number of rows to erase reaches past grid height!");
+            rowCount = (int)HEIGHT - y;
         }
 
-        if (!rowFilled)
-            return false;
+        for (int i = 0; i < WIDTH; i++)
+        {
+            for (int j = y + rowCount; j < HEIGHT; j++)
+                internalState[i, j - rowCount] = internalState[i, j];
+            for (int k = (int)HEIGHT - rowCount; k < HEIGHT; k++)
+                internalState[i, k] = false;
+        }
+    }
+
+    public int AutoPrune()
+    {
+        // Erases first group of contiguous rows from internalState that are complete (all true)
+        // Returns the number of erased rows
+
+        bool searching = true;
+        int startRow = -1;
+        int rowCount = 0;
+
+        for (int j = 0; j < HEIGHT; j++)
+        {
+            bool rowFill = CheckRowFill(j);
+            if (rowFill && searching)
+            {
+                startRow = j;
+                searching = false;
+            }
+            else if (rowFill)
+                rowCount++;
+            else if (!searching && !rowFill)
+                break;
+        }
+
+        EraseRows(startRow, rowCount);
+        return rowCount;
+    }
+
+    public bool CheckRowFill(int y)
+    {
+        for (int i = 0; i < WIDTH; i++)
+            if (!internalState[i, y])
+                return false;
         return true;
     }
 
@@ -71,12 +112,29 @@ public class InternalTetris : MonoBehaviour
                 copy[i, j] = internalState[i, j];
         return copy;
     }
+
+    public void PrintState()
+    {
+        string row = "";
+        for (int j = (int)HEIGHT - 1; j >= 0; j--)
+        {
+            for (int i = 0; i < WIDTH; i++)
+            {
+                if (internalState[i, j])
+                    row += "+";
+                else
+                    row += "-";
+            }
+            row += '\n';
+        }
+        Debug.Log(row);
+    }
     #endregion
 
     #region Private Functions
     private bool IsIllegal(int x, int y)
     {
-        if (x < 0 || x > 20 || y < 0 || y > 20)
+        if (x < 0 || x > WIDTH || y < 0 || y > HEIGHT)
             return true;
         return false;
     }
