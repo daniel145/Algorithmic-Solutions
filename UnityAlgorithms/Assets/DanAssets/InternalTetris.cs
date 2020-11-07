@@ -8,6 +8,7 @@ public class InternalTetris : MonoBehaviour
     private const uint WIDTH = 10, HEIGHT = 20;
     private bool[,] internalState;
     public bool[,] InternalState { get { return GetAll(); } private set {} }
+    public const List<string> PIECES_LIST = ["Line", "RL", "L", "Square", "S", "RS", "T"] //R stands for reversed
     #endregion
 
     // Start is called before the first frame update
@@ -128,6 +129,62 @@ public class InternalTetris : MonoBehaviour
             row += '\n';
         }
         Debug.Log(row);
+    }
+
+    //Takes in a tetris piece (Line, RL, L, Square, RS, S)
+    //returns 
+    public List<bool[,]> PotentialStates(string piece) 
+    {
+        List<bool[,]> statesList = new List<bool[,]>();
+        // have to make a deep copy of internalState b/c its passed by reference
+        int startingLoc = 0; //starting y coordinate
+        if (piece = "Line") 
+        {
+            for(int i = 0; i < WIDTH; i++)
+            {
+                bool[,] tempState = GetAll();
+                startingLoc = checkHeight(i); //will be implemented later
+                tempState[i, startingLoc + 1] = true;
+                tempState[i, startingLoc + 2] = true;
+                tempState[i, startingLoc + 3] = true;
+                tempState[i, startingLoc + 4] = true;
+                PotentialStates.add(tempState);
+                if (i + 4 < WIDTH) //Handles horizontal lines, makes sure it does not go over
+                {
+                    tempState = GetAll(); //resets tempState
+                    tempState[i, startingLoc + 1] = true;
+                    tempState[i + 1, startingLoc + 1] = true;
+                    tempState[i + 2, startingLoc + 1] = true;
+                    tempState[i + 3, startingLoc + 1] = true;
+                    PotentialStates.add(tempState);
+                }
+            }
+        }
+        else if (piece = "RL") 
+        {
+            for(int i = 0; i < WIDTH - 1; i++)
+            {
+                bool[,] tempState = GetAll();
+                startingLoc = checkHeight(i);
+            }
+        }
+        else if (piece = "L") { }
+        else if (piece = "Square") 
+        {
+            for(int i = 0; i < WIDTH-1; i++)
+            {
+                bool[,] tempState = GetAll();
+                startingLoc = checkHeight(i); 
+                tempState[i, startingLoc + 1] = true;
+                tempState[i, startingLoc + 2] = true;
+                tempState[i + 1, startingLoc + 1] = true;
+                tempState[i + 1, startingLoc + 2] = true;
+                PotentialStates.add(tempState);
+            }
+        }
+        else if (piece = "RS") { }
+        else { } //Normal S
+        return statesList;
     }
     #endregion
 
