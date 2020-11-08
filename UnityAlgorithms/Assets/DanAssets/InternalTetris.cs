@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class InternalTetris : MonoBehaviour
@@ -193,18 +195,20 @@ public class InternalTetris : MonoBehaviour
     }
 
     //Takes in a tetris piece (Line, RL, L, Square, RS, S)
-    //returns 
+    //returns list of potential states
+    //might need to check if the entire shape is empty before placing the piece using GetMultiple
     public List<bool[,]> PotentialStates(string piece) 
     {
         List<bool[,]> statesList = new List<bool[,]>();
         // have to make a deep copy of internalState b/c its passed by reference
         int startingLoc = 0; //starting y coordinate
+        bool[,] tempState;
         if (piece = "Line") 
         {
             for(int i = 0; i < WIDTH; i++)
             {
-                bool[,] tempState = GetAll();
-                startingLoc = checkHeight(i); //will be implemented later
+                tempState = GetAll();
+                startingLoc = CheckHeight(i); //will be implemented later
                 tempState[i, startingLoc + 1] = true;
                 tempState[i, startingLoc + 2] = true;
                 tempState[i, startingLoc + 3] = true;
@@ -213,6 +217,7 @@ public class InternalTetris : MonoBehaviour
                 if (i + 4 < WIDTH) //Handles horizontal lines, makes sure it does not go over
                 {
                     tempState = GetAll(); //resets tempState
+                    startingLoc = Mathf.Max(CheckHeight(i), CheckHeight(i + 1), CheckHeight(i + 2), CheckHeight(i + 3));
                     tempState[i, startingLoc + 1] = true;
                     tempState[i + 1, startingLoc + 1] = true;
                     tempState[i + 2, startingLoc + 1] = true;
@@ -225,17 +230,90 @@ public class InternalTetris : MonoBehaviour
         {
             for(int i = 0; i < WIDTH - 1; i++)
             {
-                bool[,] tempState = GetAll();
-                startingLoc = checkHeight(i);
+                tempState = GetAll();
+                startingLoc = (CheckHeight(i) < CheckHeight(i + 1)) ? CheckHeight(i) : CheckHeight(i + 1) - 2;
+                tempState[i, startingLoc + 1] = true;
+                tempState[i, startingLoc + 2] = true;
+                tempState[i, startingLoc + 3] = true;
+                tempState[i + 1, startingLoc + 3] = true;
+                PotentialStates.add(tempState);
+
+                //flipped
+                tempState = GetAll();
+                startingLoc = Mathf.Max(CheckHeight(i), CheckHeight(i + 1));
+                tempState[i, startingLoc + 1] = true;
+                tempState[i + 1, startingLoc + 1] = true;
+                tempState[i + 1, startingLoc + 2] = true;
+                tempState[i + 1, startingLoc + 3] = true;
+                PotentialStates.add(tempState);
+
+                //For the two horizontal orientations
+                if (i + 3 < WIDTH)
+                {
+                    tempState = GetAll();
+                    startingLoc = Mathf.Max(CheckHeight(i), CheckHeight(i + 1), CheckHeight(i + 2));
+                    tempState[i, startingLoc + 1] = true;
+                    tempState[i, startingLoc + 2] = true;
+                    tempState[i + 1, startingLoc + 1] = true;
+                    tempState[i + 2, startingLoc + 1] = true;
+                    PotentialStates.add(tempState);
+
+                    tempState = GetAll();
+                    startingLoc = (CheckHeight(i) > Mathf.Max(CheckHeight(i + 1), CheckHeight(i+2))) ? CheckHeight(i) : Mathf.Max(CheckHeight(i + 1), CheckHeight(i+2)) + 1;
+                    tempState[i, startingLoc + 1] = true;
+                    tempState[i + 1, startingLoc + 1] = true;
+                    tempState[i + 2, startingLoc + 1] = true;
+                    tempState[i + 2, startingLoc] = true;
+                    PotentialStates.add(tempState);
+                }
             }
         }
-        else if (piece = "L") { }
+        else if (piece = "L") 
+        {
+            for(int i = 0; i < WIDTH - 1; i++)
+            {
+                tempState = GetAll();
+                startingLoc = Mathf.Max(CheckHeight(i), CheckHeight(i + 1));
+                tempState[i, startingLoc + 1] = true;
+                tempState[i, startingLoc + 2] = true;
+                tempState[i, startingLoc + 3] = true;
+                tempState[i + 1, startingLoc + 1] = true;
+                PotentialStates.add(tempState);
+
+                tempState = GetAll();
+                startingLoc = (CheckHeight(i) > CheckHeight(i + 1)) ? CheckHeight(i) : CheckHeight(i + 1) + 2;
+                tempState[i, startingLoc + 1] = true;
+                tempState[i + 1, startingLoc + 1] = true;
+                tempState[i + 1, startingLoc] = true;
+                tempState[i + 1, startingLoc - 1] = true;
+                PotentialStates.add(tempState);
+
+                if(i + 2 < WIDTH)
+                {
+                    tempState = GetAll();
+                    startingLoc = Mathf.Max(CheckHeight(i), CheckHeight(i + 1), CheckHeight(i + 2));
+                    tempState[i, startingLoc + 1] = true;
+                    tempState[i + 1, startingLoc + 1] = true;
+                    tempState[i + 2, startingLoc + 1] = true;
+                    tempState[i + 2, startingLoc + 2] = true;
+                    PotentialStates.add(tempState);
+
+                    tempState = GetAll();
+                    startingLoc = (CheckHeight(i) < Mathf.Max(CheckHeight(i + 1), CheckHeight(i + 2))) ? CheckHeight(i) : Mathf.Max(CheckHeight(i + 1), CheckHeight(i + 2)) - 1;
+                    tempState[i, startingLoc + 1] = true;
+                    tempState[i, startingLoc + 2] = true;
+                    tempState[i + 1, startingLoc + 2] = true;
+                    tempState[i + 2, startingLoc + 2] = true;
+                    PotentialStates.add(tempState);
+                }
+            }
+        }
         else if (piece = "Square") 
         {
             for(int i = 0; i < WIDTH-1; i++)
             {
-                bool[,] tempState = GetAll();
-                startingLoc = checkHeight(i); 
+                tempState = GetAll();
+                startingLoc = Mathf.Max(CheckHeight(i), CheckHeight(i + 1)); 
                 tempState[i, startingLoc + 1] = true;
                 tempState[i, startingLoc + 2] = true;
                 tempState[i + 1, startingLoc + 1] = true;
